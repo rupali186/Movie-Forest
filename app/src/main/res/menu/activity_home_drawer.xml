@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_movies"
+            android:icon="@drawable/ic_movie"
+            android:title="Movies"
+            />
+        <item
+            android:id="@+id/nav_tv"
+            android:icon="@drawable/ic_tv"
+            android:title="Tv Shows" />
+        <item
+            android:id="@+id/nav_people"
+            android:icon="@drawable/ic_people_icon"
+            android:title="Celebs" />
+        <item
+            android:id="@+id/nav_about"
+            android:icon="@drawable/ic_about_icon"
+            android:title="About" />
+    </group>
+
+    <item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_share"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_feedback"
+                android:icon="@drawable/ic_feedback_icon"
+                android:title="Feedback" />
+        </menu>
+    </item>
+
+</menu>

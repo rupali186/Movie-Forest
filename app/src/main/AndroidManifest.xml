@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.rupali.movieforest">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".MovieActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar" >
+
+        </activity>
+        <activity
+            android:name=".MovieViewActivity"
+            android:label="@string/title_activity_movie_view"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".GenreActivity"
+            android:label="@string/title_activity_genre"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".MovieItemActivity"
+            android:label="@string/title_activity_movie_item"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".YoutubePlayerActivity" />
+        <activity
+            android:name=".ReviewActivity"
+            android:label="@string/title_activity_review"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".HomeActivity"
+            android:label="@string/title_activity_home"
+            android:theme="@style/AppTheme.NoActionBar" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".CelebActivity"
+            android:label="@string/title_activity_celeb"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".CelebsDetailActivity"
+            android:label="@string/title_activity_celebs_detail"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".TvActivity"
+            android:label="@string/title_activity_tv"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".TvDetailActivity"
+            android:label="@string/title_activity_tv_detail"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".TvViewAllActivity"
+            android:label="@string/title_activity_tv_view_all"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+    </application>
+
+</manifest>
