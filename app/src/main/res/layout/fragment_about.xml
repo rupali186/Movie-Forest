@@ -23,7 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="15dp"
-        android:textColor="#795548"
+        android:textColor="@color/brown"
         android:text="@string/about_content" />
     <TextView
         android:layout_marginTop="32dp"

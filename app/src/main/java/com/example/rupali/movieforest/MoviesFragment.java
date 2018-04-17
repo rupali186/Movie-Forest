@@ -209,6 +209,7 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
             }
         });
         swipeRefreshLayout=view.findViewById(R.id.movies_swipe_refresh_layout);
+        swipeRefreshLayout.setOnRefreshListener(this);
         fetchData();
         return view;
     }
@@ -237,8 +238,8 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
             @Override
             public void onFailure(Call<MovieResponse> call, Throwable t) {
                 Log.d("NetworkResponse",t.getMessage());
-                Snackbar.make(nestedScrollView,"Network Error",Snackbar.LENGTH_LONG).show();
                 swipeRefreshLayout.setRefreshing(false);
+                Snackbar.make(nestedScrollView,"Network Error",Snackbar.LENGTH_LONG).show();
 
             }
         });
@@ -255,8 +256,8 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
             @Override
             public void onFailure(Call<MovieResponse> call, Throwable t) {
                 Log.d("NetworkResponse",t.getMessage());
-                Snackbar.make(nestedScrollView,"Network Error",Snackbar.LENGTH_LONG).show();
                 swipeRefreshLayout.setRefreshing(false);
+                Snackbar.make(nestedScrollView,"Network Error",Snackbar.LENGTH_LONG).show();
             }
         });
         upcomingCall.enqueue(new Callback<MovieResponse>() {
@@ -272,8 +273,8 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
             @Override
             public void onFailure(Call<MovieResponse> call, Throwable t) {
                 Log.d("NetworkResponse",t.getMessage());
-                Snackbar.make(nestedScrollView,"Network Error",Snackbar.LENGTH_LONG).show();
                 swipeRefreshLayout.setRefreshing(false);
+                Snackbar.make(nestedScrollView,"Network Error",Snackbar.LENGTH_LONG).show();
 
             }
         });
@@ -291,8 +292,8 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
             @Override
             public void onFailure(Call<MovieResponse> call, Throwable t) {
                 Log.d("NetworkResponse",t.getMessage());
-                Snackbar.make(nestedScrollView,"Network Error",Snackbar.LENGTH_LONG).show();
                 swipeRefreshLayout.setRefreshing(false);
+                Snackbar.make(nestedScrollView,"Network Error",Snackbar.LENGTH_LONG).show();
             }
 
         });
@@ -338,7 +339,7 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
             public void onFailure(Call<GenreResponse> call, Throwable t) {
                 Log.d("NetworkResponse",t.getMessage());
                 swipeRefreshLayout.setRefreshing(false);
-
+                Snackbar.make(nestedScrollView,"Network Error",Snackbar.LENGTH_LONG).show();
             }
         });
     }
@@ -346,6 +347,5 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
     @Override
     public void onRefresh() {
         fetchData();
-
     }
 }

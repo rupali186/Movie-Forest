@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -27,7 +28,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class TvFragment extends Fragment {
+public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     RecyclerView airingtodayRecycler;
     RecyclerView onTheAirRecycler;
     RecyclerView popularRecycler;
@@ -45,7 +46,7 @@ public class TvFragment extends Fragment {
     ArrayList<TvResponse.Tv> popularList;
     ArrayList<TvResponse.Tv> topRatedList;
     NestedScrollView nestedScrollView;
-
+    SwipeRefreshLayout swipeRefreshLayout;
     public TvFragment() {
         // Required empty public constructor
     }
@@ -157,10 +158,13 @@ public class TvFragment extends Fragment {
         popularRecycler.setAdapter(popularAdapter);
         popularRecycler.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.HORIZONTAL,false));
         nestedScrollView=view.findViewById(R.id.contentTvAct);
+        swipeRefreshLayout=view.findViewById(R.id.tv_swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(this);
         fetchData();
         return view;
     }
     private void fetchData() {
+        swipeRefreshLayout.setRefreshing(true);
         nestedScrollView.setVisibility(View.INVISIBLE);
         Retrofit retrofit=new Retrofit.Builder().baseUrl(Constants.TMDB_BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
         MovieAPI movieAPI=retrofit.create(MovieAPI.class);
@@ -183,6 +187,7 @@ public class TvFragment extends Fragment {
             @Override
             public void onFailure(Call<TvResponse> call, Throwable t) {
                 Log.d("tv Response",t.getMessage());
+                swipeRefreshLayout.setRefreshing(false);
                 Snackbar.make(nestedScrollView,"Network Error",Snackbar.LENGTH_LONG).show();
             }
         });
@@ -201,6 +206,7 @@ public class TvFragment extends Fragment {
             @Override
             public void onFailure(Call<TvResponse> call, Throwable t) {
                 Log.d("tv Response",t.getMessage());
+                swipeRefreshLayout.setRefreshing(false);
                 Snackbar.make(nestedScrollView,"Network Error",Snackbar.LENGTH_LONG).show();
             }
         });
@@ -219,6 +225,7 @@ public class TvFragment extends Fragment {
             @Override
             public void onFailure(Call<TvResponse> call, Throwable t) {
                 Log.d("tv Response",t.getMessage());
+                swipeRefreshLayout.setRefreshing(false);
                 Snackbar.make(nestedScrollView,"Network Error",Snackbar.LENGTH_LONG).show();
             }
         });
@@ -232,15 +239,21 @@ public class TvFragment extends Fragment {
                     topRatedList.addAll(arrayList);
                     topRatedAdapter.notifyDataSetChanged();
                 }
+                swipeRefreshLayout.setRefreshing(false);
                 nestedScrollView.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onFailure(Call<TvResponse> call, Throwable t) {
                 Log.d("tv Response",t.getMessage());
+                swipeRefreshLayout.setRefreshing(false);
                 Snackbar.make(nestedScrollView,"Network Error",Snackbar.LENGTH_LONG).show();
             }
         });
     }
 
+    @Override
+    public void onRefresh() {
+        fetchData();
+    }
 }

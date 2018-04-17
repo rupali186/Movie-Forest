@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -27,43 +29,76 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
-    Button explore;
-    EditText nameEditText;
-    EditText emailEditText;
+    TextView skip;
+    ImageView connectWithGoogle;
+    ImageView connectWithFacebook;
+    ViewPager viewPager;
+    ViewPagerAdapter adapter;
     TextView toolbarTitle;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbarTitle=findViewById(R.id.main_toolbar_title);
-        setSupportActionBar(toolbar);
-        toolbarTitle.setText("MovieForest");
-        getSupportActionBar().setDisplayShowTitleEnabled(false);
-        explore=findViewById(R.id.explore);
-        nameEditText=findViewById(R.id.nameEditText);
-        emailEditText=findViewById(R.id.emailEditText);
-        explore.setOnClickListener(new View.OnClickListener() {
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        toolbarTitle=findViewById(R.id.main_toolbar_title);
+//        setSupportActionBar(toolbar);
+//        toolbarTitle.setText("MovieForest");
+//        getSupportActionBar().setDisplayShowTitleEnabled(false);
+        skip=findViewById(R.id.skip);
+        skip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(nameEditText.getText().toString().length()==0){
-                    Snackbar.make(nameEditText,"name is required",Snackbar.LENGTH_LONG).show();
-                    return;
-                }
-                if(emailEditText.getText().toString().length()==0){
-                    Snackbar.make(emailEditText,"email is required",Snackbar.LENGTH_LONG).show();
-                    return;
-                }
                 SharedPreferences sharedPreferences=getSharedPreferences(Constants.SHARED_PREF_NAME,MODE_PRIVATE);
                 SharedPreferences.Editor editor=sharedPreferences.edit();
-                editor.putString(Constants.LOGIN_NAME,nameEditText.getText().toString());
-                editor.putString(Constants.LOGIN_EMAIL,emailEditText.getText().toString());
+                editor.putString(Constants.LOGIN_NAME,"Guest");
+                editor.putString(Constants.LOGIN_EMAIL,"Login Or Sign Up");
                 editor.putBoolean(Constants.PREVIOUSLY_STARTED,true);
                 editor.commit();
                 Intent intent=new Intent(MainActivity.this,HomeActivity.class);
                 startActivity(intent);
             }
         });
+        connectWithGoogle=findViewById(R.id.connectWithGoogle);
+        connectWithGoogle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        connectWithFacebook=findViewById(R.id.connectWithFacebook);
+        connectWithFacebook.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+        viewPager=findViewById(R.id.viewPager);
+        adapter=new ViewPagerAdapter(this);
+        viewPager.setAdapter(adapter);
+//        explore=findViewById(R.id.explore);
+//        nameEditText=findViewById(R.id.nameEditText);
+//        emailEditText=findViewById(R.id.emailEditText);
+//        explore.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(nameEditText.getText().toString().length()==0){
+//                    Snackbar.make(nameEditText,"name is required",Snackbar.LENGTH_LONG).show();
+//                    return;
+//                }
+//                if(emailEditText.getText().toString().length()==0){
+//                    Snackbar.make(emailEditText,"email is required",Snackbar.LENGTH_LONG).show();
+//                    return;
+//                }
+//                SharedPreferences sharedPreferences=getSharedPreferences(Constants.SHARED_PREF_NAME,MODE_PRIVATE);
+//                SharedPreferences.Editor editor=sharedPreferences.edit();
+//                editor.putString(Constants.LOGIN_NAME,nameEditText.getText().toString());
+//                editor.putString(Constants.LOGIN_EMAIL,emailEditText.getText().toString());
+//                editor.putBoolean(Constants.PREVIOUSLY_STARTED,true);
+//                editor.commit();
+//                Intent intent=new Intent(MainActivity.this,HomeActivity.class);
+//                startActivity(intent);
+//            }
+//        });
 
     }
 

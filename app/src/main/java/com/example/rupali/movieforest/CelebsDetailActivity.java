@@ -176,6 +176,7 @@ public class CelebsDetailActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<CelebResponse.Celeb> call, Throwable t) {
+
                     Snackbar.make(nestedScrollView,"Network Error",Snackbar.LENGTH_LONG).show();
                 }
             });

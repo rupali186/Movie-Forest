@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -26,7 +27,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class SearchFragment extends Fragment {
+public class SearchFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
     ArrayList<Search.Result> searchResults;
     SearchAdapter searchAdapter;
     RecyclerView searchRecycler;
@@ -73,41 +74,52 @@ public class SearchFragment extends Fragment {
             }
         });
         swipeRefreshLayout=view.findViewById(R.id.searchSwipeRefresh);
+        swipeRefreshLayout.setOnRefreshListener(this);
         searchRecycler=view.findViewById(R.id.searchRecycler);
         searchRecycler.setAdapter(searchAdapter);
         searchRecycler.setLayoutManager(new LinearLayoutManager(getContext(),LinearLayoutManager.VERTICAL,false));
+        searchRecycler.addItemDecoration(new DividerItemDecoration(getContext(),DividerItemDecoration.VERTICAL));
         bundle=getArguments();
         if(bundle!=null){
-            query=bundle.getString(Constants.SEARCH_QUERY);
-            swipeRefreshLayout.setRefreshing(true);
-            Retrofit retrofit=new Retrofit.Builder().baseUrl(Constants.TMDB_BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
-            MovieAPI movieAPI=retrofit.create(MovieAPI.class);
-            Call<Search> searchCall=movieAPI.search(query);
-            searchCall.enqueue(new Callback<Search>() {
-                @Override
-                public void onResponse(Call<Search> call, Response<Search> response) {
-                    Log.d("SearchResponse",response.message());
-                    Search search=response.body();
-                    ArrayList<Search.Result> searchArrayList=search.results;
-                    if(searchResults!=null){
-                        searchResults.clear();
-                        searchResults.addAll(searchArrayList);
-                        searchAdapter.notifyDataSetChanged();
-                    }
-                    else{
-                        Snackbar.make(searchRecycler,"No match Found",Snackbar.LENGTH_SHORT).show();
-                    }
-                    swipeRefreshLayout.setRefreshing(false);
-                }
-
-                @Override
-                public void onFailure(Call<Search> call, Throwable t) {
-                    swipeRefreshLayout.setRefreshing(false);
-                    Snackbar.make(searchRecycler,"Network error",Snackbar.LENGTH_SHORT).show();
-                }
-            });
+            fetchData();
         }
         return  view;
     }
 
+    private void fetchData() {
+        query=bundle.getString(Constants.SEARCH_QUERY);
+        swipeRefreshLayout.setRefreshing(true);
+        Retrofit retrofit=new Retrofit.Builder().baseUrl(Constants.TMDB_BASE_URL).addConverterFactory(GsonConverterFactory.create()).build();
+        MovieAPI movieAPI=retrofit.create(MovieAPI.class);
+        Call<Search> searchCall=movieAPI.search(query);
+        searchCall.enqueue(new Callback<Search>() {
+            @Override
+            public void onResponse(Call<Search> call, Response<Search> response) {
+                Log.d("SearchResponse",response.message());
+                Search search=response.body();
+                ArrayList<Search.Result> searchArrayList=search.results;
+                if(searchResults!=null){
+                    searchResults.clear();
+                    searchResults.addAll(searchArrayList);
+                    searchAdapter.notifyDataSetChanged();
+                }
+                else{
+                    swipeRefreshLayout.setRefreshing(false);
+                    Snackbar.make(searchRecycler,"No match Found",Snackbar.LENGTH_LONG).show();
+                }
+                swipeRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onFailure(Call<Search> call, Throwable t) {
+                swipeRefreshLayout.setRefreshing(false);
+                Snackbar.make(searchRecycler,"Network error",Snackbar.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    @Override
+    public void onRefresh() {
+        fetchData();
+    }
 }

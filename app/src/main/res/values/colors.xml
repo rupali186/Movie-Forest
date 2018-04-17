@@ -5,4 +5,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name="colorView">#009688</color>
     <color name="goldrod">#DAA520</color>
+    <color name="brown">#795548</color>
+    <color name="roseGray">#607D8B</color>
 </resources>
