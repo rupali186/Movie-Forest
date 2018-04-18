@@ -53,4 +53,14 @@
         app:layout_constraintHorizontal_bias="0.333"
         app:layout_constraintStart_toEndOf="@+id/viewPosterImage"
         app:layout_constraintTop_toBottomOf="@+id/viewRatingBar" />
+
+    <ToggleButton
+        android:id="@+id/movie_view_toggle"
+        android:layout_width="30dp"
+        android:layout_height="50dp"
+        android:textOn=""
+        android:textOff=""
+        android:background="@drawable/toggle_fav_image"
+        app:layout_constraintStart_toStartOf="@+id/viewPosterImage"
+        app:layout_constraintTop_toTopOf="@+id/viewPosterImage" />
 </android.support.constraint.ConstraintLayout>

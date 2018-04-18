@@ -44,4 +44,14 @@
         app:layout_constraintEnd_toEndOf="@+id/textView"
         app:layout_constraintStart_toStartOf="@+id/textView"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+    <ToggleButton
+        android:id="@+id/toggleButton"
+        android:layout_width="30dp"
+        android:layout_height="50dp"
+        android:background="@drawable/toggle_fav_image"
+        android:textOff=""
+        android:textOn=""
+        app:layout_constraintStart_toStartOf="@+id/movieImageView"
+        app:layout_constraintTop_toTopOf="@+id/movieImageView" />
 </android.support.constraint.ConstraintLayout>

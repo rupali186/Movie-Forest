@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 
@@ -43,7 +44,7 @@ public class TvActivityAdapter extends RecyclerView.Adapter<TvActivityAdapter.Vi
     }
 
     @Override
-    public void onBindViewHolder(@NonNull Viewholder holder, final int position) {
+    public void onBindViewHolder(@NonNull final Viewholder holder, final int position) {
         Log.d("tvAdapter","onBind");
         TvResponse.Tv tv=tvArrayList.get(position);
         holder.name.setText(tv.name);
@@ -51,11 +52,17 @@ public class TvActivityAdapter extends RecyclerView.Adapter<TvActivityAdapter.Vi
         Drawable drawable = holder.ratingBar.getProgressDrawable();
         drawable.setColorFilter(Color.parseColor("#DAA520"), PorterDuff.Mode.SRC_ATOP);
         holder.ratingBar.setRating(rating.floatValue());
-        Picasso.get().load(Constants.IMAGE_BASE_URL+"w500/"+tv.poster_path).into(holder.poster);
+        Picasso.get().load(Constants.IMAGE_BASE_URL+"w500/"+tv.poster_path).resize(410,600).into(holder.poster);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onItemClick(position);
+                listener.onItemClick(holder.getAdapterPosition());
+            }
+        });
+        holder.toggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onToggleClicked(holder.getAdapterPosition(),view);
             }
         });
     }
@@ -70,6 +77,7 @@ public class TvActivityAdapter extends RecyclerView.Adapter<TvActivityAdapter.Vi
         TextView name;
         ImageView poster;
         RatingBar ratingBar;
+        ToggleButton toggleButton;
 
         public Viewholder(View itemView) {
             super(itemView);
@@ -77,9 +85,11 @@ public class TvActivityAdapter extends RecyclerView.Adapter<TvActivityAdapter.Vi
             name=itemView.findViewById(R.id.textView);
             poster=itemView.findViewById(R.id.movieImageView);
             ratingBar=itemView.findViewById(R.id.ratingBar);
+            toggleButton=itemView.findViewById(R.id.toggleButton);
         }
     }
     interface OnItemClickListener{
         void onItemClick(int position);
+        void onToggleClicked(int position,View view);
     }
 }

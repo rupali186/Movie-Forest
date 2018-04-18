@@ -18,6 +18,10 @@
             android:icon="@drawable/ic_people_icon"
             android:title="Celebs" />
         <item
+            android:id="@+id/nav_favourites"
+            android:icon="@drawable/ic_favourite"
+            android:title="Favourites"/>
+        <item
             android:id="@+id/nav_about"
             android:icon="@drawable/ic_about_icon"
             android:title="About" />

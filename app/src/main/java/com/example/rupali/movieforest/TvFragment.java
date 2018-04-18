@@ -1,7 +1,10 @@
 package com.example.rupali.movieforest;
 
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -15,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 
@@ -47,6 +51,7 @@ public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefresh
     ArrayList<TvResponse.Tv> topRatedList;
     NestedScrollView nestedScrollView;
     SwipeRefreshLayout swipeRefreshLayout;
+    FavOpenHelper openHelper;
     public TvFragment() {
         // Required empty public constructor
     }
@@ -57,6 +62,7 @@ public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefresh
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_tv, container, false);
+        openHelper=FavOpenHelper.getInstance(getContext());
         airingtodayList=new ArrayList<>();
         onTheAirList=new ArrayList<>();
         popularList=new ArrayList<>();
@@ -118,6 +124,32 @@ public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefresh
                 intent.putExtras(bundle1);
                 startActivity(intent);
             }
+
+            @Override
+            public void onToggleClicked(int position, View view) {
+                ToggleButton toggleButton =(ToggleButton)view;
+                TvResponse.Tv tv=airingtodayList.get(position);
+                SQLiteDatabase database=openHelper.getWritableDatabase();
+                String []selectionArgs={tv.id+"",Constants.TV_MEDIA_TYPE};
+                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
+                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
+                if(cursor.moveToFirst()){
+                    toggleButton.setChecked(false);
+                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
+                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
+                }
+                else {
+                    toggleButton.setChecked(true);
+                    ContentValues contentValues=new ContentValues();
+                    contentValues.put(Contract.FavTable.ID,tv.id);
+                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
+                    contentValues.put(Contract.FavTable.MEDIA_TYPE,Constants.TV_MEDIA_TYPE);
+                    contentValues.put(Contract.FavTable.POPULARITY,tv.popularity);
+                    contentValues.put(Contract.FavTable.POSTER_PATH,tv.poster_path);
+                    contentValues.put(Contract.FavTable.TITLE,tv.name);
+                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
+                }
+            }
         });
         onTheairAdapter=new TvActivityAdapter(getContext(), onTheAirList, new TvActivityAdapter.OnItemClickListener() {
             @Override
@@ -127,6 +159,32 @@ public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefresh
                 bundle1.putInt(Constants.TV_ID,onTheAirList.get(position).id);
                 intent.putExtras(bundle1);
                 startActivity(intent);
+            }
+
+            @Override
+            public void onToggleClicked(int position, View view) {
+                ToggleButton toggleButton =(ToggleButton)view;
+                TvResponse.Tv tv=onTheAirList.get(position);
+                SQLiteDatabase database=openHelper.getWritableDatabase();
+                String []selectionArgs={tv.id+"",Constants.TV_MEDIA_TYPE};
+                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
+                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
+                if(cursor.moveToFirst()){
+                    toggleButton.setChecked(false);
+                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
+                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
+                }
+                else {
+                    toggleButton.setChecked(true);
+                    ContentValues contentValues=new ContentValues();
+                    contentValues.put(Contract.FavTable.ID,tv.id);
+                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
+                    contentValues.put(Contract.FavTable.MEDIA_TYPE,Constants.TV_MEDIA_TYPE);
+                    contentValues.put(Contract.FavTable.POPULARITY,tv.popularity);
+                    contentValues.put(Contract.FavTable.POSTER_PATH,tv.poster_path);
+                    contentValues.put(Contract.FavTable.TITLE,tv.name);
+                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
+                }
             }
         });
         popularAdapter=new TvActivityAdapter(getContext(), popularList, new TvActivityAdapter.OnItemClickListener() {
@@ -138,6 +196,32 @@ public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefresh
                 intent.putExtras(bundle1);
                 startActivity(intent);
             }
+
+            @Override
+            public void onToggleClicked(int position, View view) {
+                ToggleButton toggleButton =(ToggleButton)view;
+                TvResponse.Tv tv=popularList.get(position);
+                SQLiteDatabase database=openHelper.getWritableDatabase();
+                String []selectionArgs={tv.id+"",Constants.TV_MEDIA_TYPE};
+                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
+                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
+                if(cursor.moveToFirst()){
+                    toggleButton.setChecked(false);
+                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
+                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
+                }
+                else {
+                    toggleButton.setChecked(true);
+                    ContentValues contentValues=new ContentValues();
+                    contentValues.put(Contract.FavTable.ID,tv.id);
+                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
+                    contentValues.put(Contract.FavTable.MEDIA_TYPE,Constants.TV_MEDIA_TYPE);
+                    contentValues.put(Contract.FavTable.POPULARITY,tv.popularity);
+                    contentValues.put(Contract.FavTable.POSTER_PATH,tv.poster_path);
+                    contentValues.put(Contract.FavTable.TITLE,tv.name);
+                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
+                }
+            }
         });
         topRatedAdapter=new TvActivityAdapter(getContext(), topRatedList, new TvActivityAdapter.OnItemClickListener() {
             @Override
@@ -147,6 +231,32 @@ public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefresh
                 bundle1.putInt(Constants.TV_ID,topRatedList.get(position).id);
                 intent.putExtras(bundle1);
                 startActivity(intent);
+            }
+
+            @Override
+            public void onToggleClicked(int position, View view) {
+                ToggleButton toggleButton =(ToggleButton)view;
+                TvResponse.Tv tv=topRatedList.get(position);
+                SQLiteDatabase database=openHelper.getWritableDatabase();
+                String []selectionArgs={tv.id+"",Constants.TV_MEDIA_TYPE};
+                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
+                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
+                if(cursor.moveToFirst()){
+                    toggleButton.setChecked(false);
+                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
+                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
+                }
+                else {
+                    toggleButton.setChecked(true);
+                    ContentValues contentValues=new ContentValues();
+                    contentValues.put(Contract.FavTable.ID,tv.id);
+                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
+                    contentValues.put(Contract.FavTable.MEDIA_TYPE,Constants.TV_MEDIA_TYPE);
+                    contentValues.put(Contract.FavTable.POPULARITY,tv.popularity);
+                    contentValues.put(Contract.FavTable.POSTER_PATH,tv.poster_path);
+                    contentValues.put(Contract.FavTable.TITLE,tv.name);
+                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
+                }
             }
         });
         airingtodayRecycler.setAdapter(airingTodayAdapter);

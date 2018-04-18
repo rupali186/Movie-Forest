@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 
@@ -21,10 +22,10 @@ import java.util.zip.Inflater;
 
 public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder> {
     Context context;
-    ArrayList<Search.Result> results;
+    ArrayList<SearchResults> results;
     OnItemClickListener listener;
 
-    public SearchAdapter(Context context, ArrayList<Search.Result> results, OnItemClickListener listener) {
+    public SearchAdapter(Context context, ArrayList<SearchResults> results, OnItemClickListener listener) {
         this.context = context;
         this.results = results;
         this.listener = listener;
@@ -40,8 +41,8 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, final int position) {
-        Search.Result result=results.get(position);
+    public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
+        SearchResults result=results.get(position);
         holder.mediaType.setText(result.media_type);
         if(result.media_type.equalsIgnoreCase("person")){
             Picasso.get().load(Constants.IMAGE_BASE_URL+"/w185"+result.profile_path).resize(300,400).into(holder.profile);
@@ -50,6 +51,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             }
             holder.mediaType.setText("Celeb");
             holder.name.setText(result.name);
+            holder.toggleButton.setVisibility(View.GONE);
         }
         else if(result.media_type.equalsIgnoreCase("tv")) {
             Picasso.get().load(Constants.IMAGE_BASE_URL + "/w185" + result.poster_path).resize(300, 400).into(holder.profile);
@@ -74,9 +76,19 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onItemClick(position);
+                listener.onItemClick(holder.getAdapterPosition());
             }
         });
+        holder.toggleButton.setVisibility(View.VISIBLE);
+        holder.toggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onToggleClick(holder.getAdapterPosition(),view);
+            }
+        });
+        if (result.isToggled.charAt(0)=='t'){
+            holder.toggleButton.setChecked(true);
+        }
     }
 
     @Override
@@ -85,6 +97,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
     }
     interface OnItemClickListener{
         void onItemClick(int position);
+        void onToggleClick(int position, View view);
     }
     class ViewHolder extends RecyclerView.ViewHolder{
         View itemView;
@@ -92,7 +105,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
         TextView popularity;
         TextView mediaType;
         ImageView profile;
-
+        ToggleButton toggleButton;
         public ViewHolder(View itemView) {
             super(itemView);
             this.itemView=itemView;
@@ -100,6 +113,7 @@ public class SearchAdapter extends RecyclerView.Adapter<SearchAdapter.ViewHolder
             popularity=itemView.findViewById(R.id.search_popularity);
             mediaType=itemView.findViewById(R.id.search_media_type);
             profile=itemView.findViewById(R.id.search_profile);
+            toggleButton=itemView.findViewById(R.id.search_toggle);
         }
     }
 }

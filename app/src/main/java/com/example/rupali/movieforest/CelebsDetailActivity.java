@@ -90,6 +90,11 @@ public class CelebsDetailActivity extends AppCompatActivity {
                 intent.putExtras(bundle1);
                 startActivity(intent);
             }
+
+            @Override
+            public void onFavoriteClicked(int position,View view) {
+
+            }
         },movieCastArrayList);
         movieCastRecycler.setAdapter(movieRecyclerAdapter);
         movieCastRecycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
@@ -101,6 +106,11 @@ public class CelebsDetailActivity extends AppCompatActivity {
                 bundle1.putInt(Constants.TV_ID,tvCastArrayList.get(position).id);
                 intent.putExtras(bundle1);
                 startActivity(intent);
+            }
+
+            @Override
+            public void onToggleClicked(int position, View view) {
+                
             }
         });
         tvCastRecycler.setAdapter(tvCastAdapter);

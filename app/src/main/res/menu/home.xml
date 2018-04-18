@@ -13,4 +13,15 @@
         app:showAsAction="always|collapseActionView"
         app:actionViewClass="android.support.v7.widget.SearchView"
         android:title="Search"/>
+    <!--<item android:id="@+id/profile"-->
+        <!--app:showAsAction="always|collapseActionView"-->
+        <!--android:icon="@drawable/ic_people_icon"-->
+        <!--android:title="Profile">-->
+        <!--<menu >-->
+            <!--<item android:title="LogOut"-->
+                <!--android:id="@+id/logOut"-->
+                <!--android:icon="@drawable/ic_key_vector"/>-->
+        <!--</menu>-->
+    <!--</item>-->
+
 </menu>

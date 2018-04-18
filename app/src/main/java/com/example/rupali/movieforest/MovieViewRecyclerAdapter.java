@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 
@@ -47,7 +48,7 @@ public class MovieViewRecyclerAdapter extends RecyclerView.Adapter<MovieViewRecy
         Drawable drawable = holder.ratingBar.getProgressDrawable();
         drawable.setColorFilter(Color.parseColor("#DAA520"), PorterDuff.Mode.SRC_ATOP);
         holder.ratingBar.setRating(rating.floatValue());
-        Picasso.get().load(Constants.IMAGE_BASE_URL+"w342"+movie.poster_path).into(holder.poster);
+        Picasso.get().load(Constants.IMAGE_BASE_URL+"w342"+movie.poster_path).resize(340,500).into(holder.poster);
 //        ArrayList<Genre> genreArrayList=movie.genres;
 //        for (int i=0;i<genreArrayList.size();i++){
 //            String text=holder.genres.getText().toString();
@@ -65,6 +66,12 @@ public class MovieViewRecyclerAdapter extends RecyclerView.Adapter<MovieViewRecy
                 listener.onItemClick(holder.getAdapterPosition());
             }
         });
+        holder.toggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onToggleClicked(holder.getAdapterPosition(),view);
+            }
+        });
     }
 
     @Override
@@ -73,6 +80,7 @@ public class MovieViewRecyclerAdapter extends RecyclerView.Adapter<MovieViewRecy
     }
     interface OnItemClickListener{
         void onItemClick(int position);
+        void onToggleClicked(int position,View view);
     }
 
     class ViewHolder extends RecyclerView.ViewHolder{
@@ -81,7 +89,7 @@ public class MovieViewRecyclerAdapter extends RecyclerView.Adapter<MovieViewRecy
         TextView genres;
         RatingBar ratingBar;
         View itemView;
-
+        ToggleButton toggleButton;
         public ViewHolder(View itemView) {
             super(itemView);
             this.itemView=itemView;
@@ -89,7 +97,7 @@ public class MovieViewRecyclerAdapter extends RecyclerView.Adapter<MovieViewRecy
             title=itemView.findViewById(R.id.viewTitle);
             genres=itemView.findViewById(R.id.viewGenres);
             ratingBar=itemView.findViewById(R.id.viewRatingBar);
-
+            toggleButton=itemView.findViewById(R.id.movie_view_toggle);
         }
     }
 }

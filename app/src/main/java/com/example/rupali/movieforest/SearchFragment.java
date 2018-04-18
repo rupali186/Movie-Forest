@@ -2,7 +2,10 @@ package com.example.rupali.movieforest;
 
 
 import android.app.SearchableInfo;
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -14,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 
@@ -28,12 +32,13 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * A simple {@link Fragment} subclass.
  */
 public class SearchFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
-    ArrayList<Search.Result> searchResults;
+    ArrayList<SearchResults> searchResults;
     SearchAdapter searchAdapter;
     RecyclerView searchRecycler;
     String query=null;
     Bundle bundle;
     SwipeRefreshLayout swipeRefreshLayout;
+    FavOpenHelper openHelper;
     public SearchFragment() {
         // Required empty public constructor
     }
@@ -45,10 +50,11 @@ public class SearchFragment extends Fragment implements SwipeRefreshLayout.OnRef
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_search, container, false);
         searchResults=new ArrayList<>();
+        openHelper=FavOpenHelper.getInstance(getContext());
         searchAdapter=new SearchAdapter(getContext(), searchResults, new SearchAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-                Search.Result result=searchResults.get(position);
+                SearchResults result=searchResults.get(position);
                 if(result.media_type.equalsIgnoreCase("tv")){
                     Intent intent=new Intent(getContext(),TvDetailActivity.class);
                     Bundle bundle1=new Bundle();
@@ -71,6 +77,32 @@ public class SearchFragment extends Fragment implements SwipeRefreshLayout.OnRef
                     startActivity(intent);
                 }
 
+            }
+
+            @Override
+            public void onToggleClick(int position, View view) {
+                ToggleButton toggleButton =(ToggleButton)view;
+                SearchResults result=searchResults.get(position);
+                SQLiteDatabase database=openHelper.getWritableDatabase();
+                String []selectionArgs={result.id+"",result.media_type};
+                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
+                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
+                if(cursor.moveToFirst()){
+                    toggleButton.setChecked(false);
+                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
+                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
+                }
+                else {
+                    toggleButton.setChecked(true);
+                    ContentValues contentValues=new ContentValues();
+                    contentValues.put(Contract.FavTable.ID,result.id);
+                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
+                    contentValues.put(Contract.FavTable.MEDIA_TYPE,"movie");
+                    contentValues.put(Contract.FavTable.POPULARITY,result.popularity);
+                    contentValues.put(Contract.FavTable.POSTER_PATH,result.poster_path);
+                    contentValues.put(Contract.FavTable.TITLE,result.title);
+                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
+                }
             }
         });
         swipeRefreshLayout=view.findViewById(R.id.searchSwipeRefresh);
@@ -97,7 +129,7 @@ public class SearchFragment extends Fragment implements SwipeRefreshLayout.OnRef
             public void onResponse(Call<Search> call, Response<Search> response) {
                 Log.d("SearchResponse",response.message());
                 Search search=response.body();
-                ArrayList<Search.Result> searchArrayList=search.results;
+                ArrayList<SearchResults> searchArrayList=search.results;
                 if(searchResults!=null){
                     searchResults.clear();
                     searchResults.addAll(searchArrayList);

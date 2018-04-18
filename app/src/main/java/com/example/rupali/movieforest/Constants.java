@@ -23,9 +23,12 @@ public class Constants {
     final static String TMDB_BASE_URL="http://api.themoviedb.org/3/";
     final static String CELEB_ID="celebID";
     final static String LOGIN_NAME="loginName";
-    final static String LOGIN_EMAIL="loginEmail";
+    final static String CONNECT_WITH_FACEBOOK="connectWithFb";
+    final static String LOGIN_PROFILE_URL="loginUserId";
     final static String SHARED_PREF_NAME="loginInfo";
     final static String PREVIOUSLY_STARTED="previouslyStarted";
     final static String SEARCH_QUERY="searchQuery";
     final static String GENRE_NAME="genreName";
+    final static String TV_MEDIA_TYPE="Tv";
+    final static String MOVIE_MEDIA_TYPE="Movie";
 }

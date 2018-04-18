@@ -1,6 +1,9 @@
 package com.example.rupali.movieforest;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 
@@ -31,6 +35,7 @@ public class MovieViewActivity extends AppCompatActivity {
     ConstraintLayout constraintLayout;
     ProgressBar progressBar;
     TextView toolbarTitle;
+    FavOpenHelper openHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,6 +44,7 @@ public class MovieViewActivity extends AppCompatActivity {
         toolbarTitle=findViewById(R.id.movie_view_toolbar_title);
         setSupportActionBar(toolbar);
         toolbarTitle.setText("Movies");
+        openHelper=FavOpenHelper.getInstance(this);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
         movieArrayList=new ArrayList<>();
         recyclerView=findViewById(R.id.viewRecyclerView);
@@ -50,6 +56,32 @@ public class MovieViewActivity extends AppCompatActivity {
                 Intent intent=new Intent(MovieViewActivity.this,MovieItemActivity.class);
                 intent.putExtras(bundle1);
                 startActivity(intent);
+            }
+
+            @Override
+            public void onToggleClicked(int position, View view) {
+                ToggleButton toggleButton =(ToggleButton)view;
+                Movie movie1=movieArrayList.get(position);
+                SQLiteDatabase database=openHelper.getWritableDatabase();
+                String []selectionArgs={movie1.id+"",Constants.MOVIE_MEDIA_TYPE};
+                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
+                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
+                if(cursor.moveToFirst()){
+                    toggleButton.setChecked(false);
+                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
+                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
+                }
+                else {
+                    toggleButton.setChecked(true);
+                    ContentValues contentValues=new ContentValues();
+                    contentValues.put(Contract.FavTable.ID,movie1.id);
+                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
+                    contentValues.put(Contract.FavTable.MEDIA_TYPE,Constants.MOVIE_MEDIA_TYPE);
+                    contentValues.put(Contract.FavTable.POPULARITY,movie1.popularity);
+                    contentValues.put(Contract.FavTable.POSTER_PATH,movie1.poster_path);
+                    contentValues.put(Contract.FavTable.TITLE,movie1.title);
+                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
+                }
             }
         }, movieArrayList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false));

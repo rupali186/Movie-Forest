@@ -56,4 +56,14 @@
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="@+id/imageView10"
         app:layout_constraintStart_toEndOf="@+id/imageView10" />
+
+    <ToggleButton
+        android:id="@+id/search_toggle"
+        android:layout_width="30dp"
+        android:layout_height="50dp"
+        android:textOff=""
+        android:textOn=""
+        android:background="@drawable/toggle_fav_image"
+        app:layout_constraintStart_toStartOf="@+id/search_profile"
+        app:layout_constraintTop_toTopOf="@+id/search_profile" />
 </android.support.constraint.ConstraintLayout>

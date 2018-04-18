@@ -1,6 +1,9 @@
 package com.example.rupali.movieforest;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -16,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 
@@ -59,6 +63,7 @@ public class MovieItemActivity extends AppCompatActivity {
     ArrayList<Reviews.Result> reviewArrayList;
     boolean isExpanded=false;
     TextView toolbarTitle;
+    FavOpenHelper openHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,6 +79,7 @@ public class MovieItemActivity extends AppCompatActivity {
         castArrayList=new ArrayList<>();
         crewArrayList=new ArrayList<>();
         similarArrayList=new ArrayList<>();
+        openHelper=FavOpenHelper.getInstance(this);
         castRecyclerAdapter=new CastRecyclerAdapter(this, castArrayList, new CastRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
@@ -100,6 +106,32 @@ public class MovieItemActivity extends AppCompatActivity {
                 Intent intent=new Intent(MovieItemActivity.this,MovieItemActivity.class);
                 intent.putExtra(Constants.MOVIE_ID,similarArrayList.get(position).id);
                 startActivity(intent);
+            }
+
+            @Override
+            public void onFavoriteClicked(int position,View view) {
+                ToggleButton toggleButton =(ToggleButton)view;
+                Movie movie1=similarArrayList.get(position);
+                SQLiteDatabase database=openHelper.getWritableDatabase();
+                String []selectionArgs={movie1.id+"",Constants.MOVIE_MEDIA_TYPE};
+                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
+                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
+                if(cursor.moveToFirst()){
+                    toggleButton.setChecked(false);
+                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
+                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
+                }
+                else {
+                    toggleButton.setChecked(true);
+                    ContentValues contentValues=new ContentValues();
+                    contentValues.put(Contract.FavTable.ID,movie1.id);
+                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
+                    contentValues.put(Contract.FavTable.MEDIA_TYPE,Constants.MOVIE_MEDIA_TYPE);
+                    contentValues.put(Contract.FavTable.POPULARITY,movie1.popularity);
+                    contentValues.put(Contract.FavTable.POSTER_PATH,movie1.poster_path);
+                    contentValues.put(Contract.FavTable.TITLE,movie1.title);
+                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
+                }
             }
         }, similarArrayList);
         viewAllReview=findViewById(R.id.viewAllReviewRecycler);

@@ -1,6 +1,9 @@
 package com.example.rupali.movieforest;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
@@ -16,6 +19,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 
@@ -54,6 +58,7 @@ public class TvDetailActivity extends AppCompatActivity {
     ProgressBar progressBar;
     NestedScrollView nestedScrollView;
     TextView toolbarTitle;
+    FavOpenHelper openHelper;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +80,7 @@ public class TvDetailActivity extends AppCompatActivity {
                 }
             }
         });
+        openHelper=FavOpenHelper.getInstance(this);
         title=findViewById(R.id.showTitle);
         voteAverage=findViewById(R.id.showVoteAverage);
         overview=findViewById(R.id.showOverviewContent);
@@ -141,6 +147,32 @@ public class TvDetailActivity extends AppCompatActivity {
             @Override
             public void onItemClick(int position) {
 
+            }
+
+            @Override
+            public void onToggleClicked(int position, View view) {
+                ToggleButton toggleButton =(ToggleButton)view;
+                TvResponse.Tv tv=similarArrayList.get(position);
+                SQLiteDatabase database=openHelper.getWritableDatabase();
+                String []selectionArgs={tv.id+"",Constants.TV_MEDIA_TYPE};
+                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
+                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
+                if(cursor.moveToFirst()){
+                    toggleButton.setChecked(false);
+                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
+                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
+                }
+                else {
+                    toggleButton.setChecked(true);
+                    ContentValues contentValues=new ContentValues();
+                    contentValues.put(Contract.FavTable.ID,tv.id);
+                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
+                    contentValues.put(Contract.FavTable.MEDIA_TYPE,Constants.TV_MEDIA_TYPE);
+                    contentValues.put(Contract.FavTable.POPULARITY,tv.popularity);
+                    contentValues.put(Contract.FavTable.POSTER_PATH,tv.poster_path);
+                    contentValues.put(Contract.FavTable.TITLE,tv.name);
+                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
+                }
             }
         });
         similarRecycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));

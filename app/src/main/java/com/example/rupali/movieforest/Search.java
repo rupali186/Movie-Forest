@@ -7,25 +7,40 @@ import java.util.ArrayList;
  */
 
 public class Search {
-    ArrayList<Result> results;
+    ArrayList<SearchResults> results;
     int total_results;
     int total_pages;
-    class Result{
-        int id;
-        Double vote_average;
-        boolean video;
-        String media_type;
-        String title;
-        String name;
-        Double popularity;
-        String poster_path;
-        String profile_path;
-        String original_language;
-        String original_title;
-        String backdrop_path;
-        String overview;
-        String release_date;
-        boolean adult;
+
+    }
+class SearchResults{
+    int id;
+    String isToggled="false"; //for favourites
+    Double vote_average;
+    boolean video;
+    String media_type;
+    String title;
+    String name;
+    Double popularity;
+    String poster_path;
+    String profile_path;
+    String original_language;
+    String original_title;
+    String backdrop_path;
+    String overview;
+    String release_date;
+    boolean adult;
+
+    public SearchResults() {
+    }
+
+    public SearchResults(int id, String isToggled, String media_type, String title, Double popularity, String poster_path,String name) {
+        this.id = id;
+        this.isToggled = isToggled;
+        this.media_type = media_type;
+        this.title = title;
+        this.popularity = popularity;
+        this.poster_path = poster_path;
+        this.name=name;
     }
 //    "page": 1,
 //            "total_results": 284,

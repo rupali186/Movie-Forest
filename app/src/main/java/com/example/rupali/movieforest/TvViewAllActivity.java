@@ -1,6 +1,9 @@
 package com.example.rupali.movieforest;
 
+import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -14,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 
@@ -31,6 +35,7 @@ public class TvViewAllActivity extends AppCompatActivity {
     ConstraintLayout constraintLayout;
     ProgressBar progressBar;
     TextView toolbarTitle;
+    FavOpenHelper openHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,6 +45,7 @@ public class TvViewAllActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbarTitle.setText("Tv Shows");
         getSupportActionBar().setDisplayShowTitleEnabled(false);
+        openHelper=FavOpenHelper.getInstance(this);
         tvArrayList=new ArrayList<>();
         recyclerView=findViewById(R.id.tvViewAllRecycler);
         adapter=new TvViewAllAdapter(this, tvArrayList, new TvViewAllAdapter.OnItemClickListener() {
@@ -50,6 +56,32 @@ public class TvViewAllActivity extends AppCompatActivity {
                 bundle1.putInt(Constants.TV_ID,tvArrayList.get(position).id);
                 intent.putExtras(bundle1);
                 startActivity(intent);
+            }
+
+            @Override
+            public void onToggleClicked(int position, View view) {
+                ToggleButton toggleButton =(ToggleButton)view;
+                TvResponse.Tv tv=tvArrayList.get(position);
+                SQLiteDatabase database=openHelper.getWritableDatabase();
+                String []selectionArgs={tv.id+"",Constants.TV_MEDIA_TYPE};
+                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
+                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
+                if(cursor.moveToFirst()){
+                    toggleButton.setChecked(false);
+                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
+                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
+                }
+                else {
+                    toggleButton.setChecked(true);
+                    ContentValues contentValues=new ContentValues();
+                    contentValues.put(Contract.FavTable.ID,tv.id);
+                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
+                    contentValues.put(Contract.FavTable.MEDIA_TYPE,Constants.TV_MEDIA_TYPE);
+                    contentValues.put(Contract.FavTable.POPULARITY,tv.popularity);
+                    contentValues.put(Contract.FavTable.POSTER_PATH,tv.poster_path);
+                    contentValues.put(Contract.FavTable.TITLE,tv.name);
+                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
+                }
             }
         });
         recyclerView.setAdapter(adapter);

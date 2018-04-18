@@ -2,6 +2,7 @@ package com.example.rupali.movieforest;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -20,7 +21,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.Profile;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -30,20 +41,16 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
     TextView skip;
-    ImageView connectWithGoogle;
-    ImageView connectWithFacebook;
     ViewPager viewPager;
     ViewPagerAdapter adapter;
-    TextView toolbarTitle;
+    LoginButton loginButton;
+    CallbackManager callbackManager;
+    String username=null;
+    String url=null;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        toolbarTitle=findViewById(R.id.main_toolbar_title);
-//        setSupportActionBar(toolbar);
-//        toolbarTitle.setText("MovieForest");
-//        getSupportActionBar().setDisplayShowTitleEnabled(false);
         skip=findViewById(R.id.skip);
         skip.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,54 +58,81 @@ public class MainActivity extends AppCompatActivity {
                 SharedPreferences sharedPreferences=getSharedPreferences(Constants.SHARED_PREF_NAME,MODE_PRIVATE);
                 SharedPreferences.Editor editor=sharedPreferences.edit();
                 editor.putString(Constants.LOGIN_NAME,"Guest");
-                editor.putString(Constants.LOGIN_EMAIL,"Login Or Sign Up");
+                editor.putBoolean(Constants.CONNECT_WITH_FACEBOOK,false);
                 editor.putBoolean(Constants.PREVIOUSLY_STARTED,true);
                 editor.commit();
                 Intent intent=new Intent(MainActivity.this,HomeActivity.class);
                 startActivity(intent);
             }
         });
-        connectWithGoogle=findViewById(R.id.connectWithGoogle);
-        connectWithGoogle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-        connectWithFacebook=findViewById(R.id.connectWithFacebook);
-        connectWithFacebook.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
         viewPager=findViewById(R.id.viewPager);
         adapter=new ViewPagerAdapter(this);
         viewPager.setAdapter(adapter);
-//        explore=findViewById(R.id.explore);
-//        nameEditText=findViewById(R.id.nameEditText);
-//        emailEditText=findViewById(R.id.emailEditText);
-//        explore.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                if(nameEditText.getText().toString().length()==0){
-//                    Snackbar.make(nameEditText,"name is required",Snackbar.LENGTH_LONG).show();
-//                    return;
-//                }
-//                if(emailEditText.getText().toString().length()==0){
-//                    Snackbar.make(emailEditText,"email is required",Snackbar.LENGTH_LONG).show();
-//                    return;
-//                }
-//                SharedPreferences sharedPreferences=getSharedPreferences(Constants.SHARED_PREF_NAME,MODE_PRIVATE);
-//                SharedPreferences.Editor editor=sharedPreferences.edit();
-//                editor.putString(Constants.LOGIN_NAME,nameEditText.getText().toString());
-//                editor.putString(Constants.LOGIN_EMAIL,emailEditText.getText().toString());
-//                editor.putBoolean(Constants.PREVIOUSLY_STARTED,true);
-//                editor.commit();
-//                Intent intent=new Intent(MainActivity.this,HomeActivity.class);
-//                startActivity(intent);
-//            }
-//        });
+        callbackManager = CallbackManager.Factory.create();
+        loginButton = (LoginButton) findViewById(R.id.login_button);
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                loginButton.setReadPermissions(Arrays.asList("email","public_profile"));
+                // If you are using in a fragment, call loginButton.setFragment(this);
+
+                // Callback registration
+                loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        // App code
+                        Profile profile=Profile.getCurrentProfile();
+                        username=profile.getFirstName();
+                        Uri uri=profile.getProfilePictureUri(60,60);
+                        if(uri!=null) {
+                            url = uri.toString();
+                        }
+                        SharedPreferences sharedPreferences=getSharedPreferences(Constants.SHARED_PREF_NAME,MODE_PRIVATE);
+                        SharedPreferences.Editor editor=sharedPreferences.edit();
+                        editor.putString(Constants.LOGIN_NAME,username);
+                        editor.putBoolean(Constants.CONNECT_WITH_FACEBOOK,true);
+                        editor.putString(Constants.LOGIN_PROFILE_URL,url);
+                        editor.putBoolean(Constants.PREVIOUSLY_STARTED,true);
+                        editor.commit();
+                        Intent intent=new Intent(MainActivity.this,HomeActivity.class);
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        // App code
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        // App code
+                    }
+                });
+            }
+
+        });
+
+//        LoginManager.getInstance().registerCallback(callbackManager,
+//                new FacebookCallback<LoginResult>() {
+//                    @Override
+//                    public void onSuccess(LoginResult loginResult) {
+//                        // App code
+//                    }
+//
+//                    @Override
+//                    public void onCancel() {
+//                        // App code
+//                    }
+//
+//                    @Override
+//                    public void onError(FacebookException exception) {
+//                        // App code
+//                    }
+//                });
+
+
+//        boolean loggedIn = AccessToken.getCurrentAccessToken() == null;
+//        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile"));
 
     }
 
@@ -124,5 +158,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.squareup.picasso.Picasso;
 
@@ -49,13 +50,19 @@ public class TvViewAllAdapter extends RecyclerView.Adapter<TvViewAllAdapter.View
         Drawable drawable = holder.ratingBar.getProgressDrawable();
         drawable.setColorFilter(Color.parseColor("#DAA520"), PorterDuff.Mode.SRC_ATOP);
         holder.ratingBar.setRating(rating.floatValue());
-        Picasso.get().load(Constants.IMAGE_BASE_URL+"w342"+tv.poster_path).into(holder.poster);
+        Picasso.get().load(Constants.IMAGE_BASE_URL+"w342"+tv.poster_path).resize(340,500).into(holder.poster);
 
         holder.genres.setText("First Air Date: "+tv.first_air_date);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 listener.onItemClick(holder.getAdapterPosition());
+            }
+        });
+        holder.toggleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onToggleClicked(holder.getAdapterPosition(),view);
             }
         });
     }
@@ -67,6 +74,7 @@ public class TvViewAllAdapter extends RecyclerView.Adapter<TvViewAllAdapter.View
 
     interface OnItemClickListener{
         void onItemClick(int position);
+        void onToggleClicked(int position,View view);
     }
     class ViewHolder extends RecyclerView.ViewHolder{
         ImageView poster;
@@ -74,7 +82,7 @@ public class TvViewAllAdapter extends RecyclerView.Adapter<TvViewAllAdapter.View
         TextView genres;
         RatingBar ratingBar;
         View itemView;
-
+        ToggleButton toggleButton;
         public ViewHolder(View itemView) {
             super(itemView);
             this.itemView=itemView;
@@ -82,7 +90,7 @@ public class TvViewAllAdapter extends RecyclerView.Adapter<TvViewAllAdapter.View
             title=itemView.findViewById(R.id.viewTitle);
             genres=itemView.findViewById(R.id.viewGenres);
             ratingBar=itemView.findViewById(R.id.viewRatingBar);
-
+            toggleButton=itemView.findViewById(R.id.movie_view_toggle);
         }
     }
 }

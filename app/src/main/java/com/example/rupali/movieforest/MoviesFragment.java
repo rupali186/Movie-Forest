@@ -1,8 +1,11 @@
 package com.example.rupali.movieforest;
 
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -17,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import java.util.ArrayList;
 
@@ -55,6 +59,7 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
 //    ProgressBar progressBar;
     NestedScrollView nestedScrollView;
     SwipeRefreshLayout swipeRefreshLayout;
+    FavOpenHelper openHelper;
 //    ClickCallback mCallback;
 //    public interface ClickCallback{
 //        void onInCinemasMovieClick(int position);
@@ -78,7 +83,7 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
 //    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view= inflater.inflate(R.layout.fragment_movies, container, false);
@@ -92,6 +97,7 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
         popularRecyclerView=view.findViewById(R.id.popularRecyclerView);
         topRatedRecyclerView=view.findViewById(R.id.topRatedRecyclerView);
         genreRecyclerView=view.findViewById(R.id.popularGenresRecyclerView);
+        openHelper=FavOpenHelper.getInstance(getContext());
         nowShowingAdapter=new MovieRecyclerAdapter(getContext(), new MovieRecyclerAdapter.OnItemClickListener() {
             @Override
             public void onItemclick(int position) {
@@ -100,6 +106,33 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 Intent intent=new Intent(getContext(),MovieItemActivity.class);
                 intent.putExtras(bundle1);
                 startActivity(intent);
+            }
+
+            @Override
+            public void onFavoriteClicked(int position,View view) {
+                ToggleButton toggleButton =(ToggleButton)view;
+                SQLiteDatabase database=openHelper.getWritableDatabase();
+                String []selectionArgs={nowShowingList.get(position).id+"",Constants.MOVIE_MEDIA_TYPE};
+                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
+                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
+                if(cursor.moveToFirst()){
+                    toggleButton.setChecked(false);
+                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
+                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
+                }
+                else {
+                    toggleButton.setChecked(true);
+                    Movie movie1=nowShowingList.get(position);
+                    ContentValues contentValues=new ContentValues();
+                    contentValues.put(Contract.FavTable.ID,movie1.id);
+                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
+                    contentValues.put(Contract.FavTable.MEDIA_TYPE,Constants.MOVIE_MEDIA_TYPE);
+                    contentValues.put(Contract.FavTable.POPULARITY,movie1.popularity);
+                    contentValues.put(Contract.FavTable.POSTER_PATH,movie1.poster_path);
+                    contentValues.put(Contract.FavTable.TITLE,movie1.title);
+                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
+                }
+
             }
         },nowShowingList);
         popularAdapter=new MovieRecyclerAdapter(getContext(), new MovieRecyclerAdapter.OnItemClickListener() {
@@ -111,6 +144,32 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 intent.putExtras(bundle1);
                 startActivity(intent);
             }
+
+            @Override
+            public void onFavoriteClicked(int position,View view) {
+                ToggleButton toggleButton =(ToggleButton)view;
+                Movie movie1=popularList.get(position);
+                SQLiteDatabase database=openHelper.getWritableDatabase();
+                String []selectionArgs={movie1.id+"",Constants.MOVIE_MEDIA_TYPE};
+                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
+                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
+                if(cursor.moveToFirst()){
+                    toggleButton.setChecked(false);
+                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
+                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
+                }
+                else {
+                    toggleButton.setChecked(true);
+                    ContentValues contentValues=new ContentValues();
+                    contentValues.put(Contract.FavTable.ID,movie1.id);
+                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
+                    contentValues.put(Contract.FavTable.MEDIA_TYPE,Constants.MOVIE_MEDIA_TYPE);
+                    contentValues.put(Contract.FavTable.POPULARITY,movie1.popularity);
+                    contentValues.put(Contract.FavTable.POSTER_PATH,movie1.poster_path);
+                    contentValues.put(Contract.FavTable.TITLE,movie1.title);
+                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
+                }
+            }
         }, popularList);
         upcomingAdapter=new MovieRecyclerAdapter(getContext(), new MovieRecyclerAdapter.OnItemClickListener() {
             @Override
@@ -120,6 +179,32 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 Intent intent=new Intent(getContext(),MovieItemActivity.class);
                 intent.putExtras(bundle1);
                 startActivity(intent);            }
+
+            @Override
+            public void onFavoriteClicked(int position,View view) {
+                ToggleButton toggleButton =(ToggleButton)view;
+                Movie movie1=upcomingList.get(position);
+                SQLiteDatabase database=openHelper.getWritableDatabase();
+                String []selectionArgs={movie1.id+"",Constants.MOVIE_MEDIA_TYPE};
+                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
+                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
+                if(cursor.moveToFirst()){
+                    toggleButton.setChecked(false);
+                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
+                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
+                }
+                else {
+                    toggleButton.setChecked(true);
+                    ContentValues contentValues=new ContentValues();
+                    contentValues.put(Contract.FavTable.ID,movie1.id);
+                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
+                    contentValues.put(Contract.FavTable.MEDIA_TYPE,Constants.MOVIE_MEDIA_TYPE);
+                    contentValues.put(Contract.FavTable.POPULARITY,movie1.popularity);
+                    contentValues.put(Contract.FavTable.POSTER_PATH,movie1.poster_path);
+                    contentValues.put(Contract.FavTable.TITLE,movie1.title);
+                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
+                }
+            }
         }, upcomingList);
         topRatedAdapter=new MovieRecyclerAdapter(getContext(), new MovieRecyclerAdapter.OnItemClickListener() {
             @Override
@@ -129,6 +214,32 @@ public class MoviesFragment extends Fragment implements SwipeRefreshLayout.OnRef
                 Intent intent=new Intent(getContext(),MovieItemActivity.class);
                 intent.putExtras(bundle1);
                 startActivity(intent);            }
+
+            @Override
+            public void onFavoriteClicked(int position,View view) {
+                ToggleButton toggleButton =(ToggleButton)view;
+                Movie movie1=topRatedList.get(position);
+                SQLiteDatabase database=openHelper.getWritableDatabase();
+                String []selectionArgs={movie1.id+"",Constants.MOVIE_MEDIA_TYPE};
+                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
+                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
+                if(cursor.moveToFirst()){
+                    toggleButton.setChecked(false);
+                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
+                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
+                }
+                else {
+                    toggleButton.setChecked(true);
+                    ContentValues contentValues=new ContentValues();
+                    contentValues.put(Contract.FavTable.ID,movie1.id);
+                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
+                    contentValues.put(Contract.FavTable.MEDIA_TYPE,Constants.MOVIE_MEDIA_TYPE);
+                    contentValues.put(Contract.FavTable.POPULARITY,movie1.popularity);
+                    contentValues.put(Contract.FavTable.POSTER_PATH,movie1.poster_path);
+                    contentValues.put(Contract.FavTable.TITLE,movie1.title);
+                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
+                }
+            }
         },topRatedList);
         genreAdapter=new GenreRecyclerAdapter(getContext(), genreList, new GenreRecyclerAdapter.OnItemClickListener() {
             @Override
