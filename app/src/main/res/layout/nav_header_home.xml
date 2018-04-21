@@ -13,12 +13,13 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:theme="@style/ThemeOverlay.AppCompat.Dark">
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/loginImageView"
         android:layout_width="60dp"
         android:layout_height="60dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="12dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:src="@drawable/profile_i"
         app:layout_constraintStart_toStartOf="parent"
@@ -28,7 +29,7 @@
         android:id="@+id/login_profile_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:gravity="center"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
         android:text="Hi Guest!"
@@ -42,7 +43,6 @@
         android:layout_width="30dp"
         android:layout_height="40dp"
         android:layout_marginTop="8dp"
-        android:visibility="invisible"
         app:layout_constraintStart_toStartOf="@+id/login_profile_name"
         app:layout_constraintTop_toBottomOf="@+id/login_profile_name"
         app:srcCompat="@drawable/key" />
@@ -52,8 +52,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
         android:text="Log In Or Sign Up!"
-        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="@+id/key"
         app:layout_constraintStart_toEndOf="@+id/key"
         app:layout_constraintTop_toTopOf="@+id/key" />

@@ -126,10 +126,10 @@ public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefresh
             }
 
             @Override
-            public void onToggleClicked(int position, View view) {
+            public void onToggleClicked(int position,View view) {
+                SQLiteDatabase database=openHelper.getWritableDatabase();
                 ToggleButton toggleButton =(ToggleButton)view;
                 TvResponse.Tv tv=airingtodayList.get(position);
-                SQLiteDatabase database=openHelper.getWritableDatabase();
                 String []selectionArgs={tv.id+"",Constants.TV_MEDIA_TYPE};
                 Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
                         Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
@@ -149,6 +149,8 @@ public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefresh
                     contentValues.put(Contract.FavTable.TITLE,tv.name);
                     database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
                 }
+
+
             }
         });
         onTheairAdapter=new TvActivityAdapter(getContext(), onTheAirList, new TvActivityAdapter.OnItemClickListener() {
@@ -162,10 +164,10 @@ public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefresh
             }
 
             @Override
-            public void onToggleClicked(int position, View view) {
+            public void onToggleClicked(int position,View view) {
+                SQLiteDatabase database=openHelper.getWritableDatabase();
                 ToggleButton toggleButton =(ToggleButton)view;
                 TvResponse.Tv tv=onTheAirList.get(position);
-                SQLiteDatabase database=openHelper.getWritableDatabase();
                 String []selectionArgs={tv.id+"",Constants.TV_MEDIA_TYPE};
                 Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
                         Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
@@ -185,6 +187,8 @@ public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefresh
                     contentValues.put(Contract.FavTable.TITLE,tv.name);
                     database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
                 }
+
+
             }
         });
         popularAdapter=new TvActivityAdapter(getContext(), popularList, new TvActivityAdapter.OnItemClickListener() {
@@ -198,10 +202,10 @@ public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefresh
             }
 
             @Override
-            public void onToggleClicked(int position, View view) {
+            public void onToggleClicked(int position,View view) {
+                SQLiteDatabase database=openHelper.getWritableDatabase();
                 ToggleButton toggleButton =(ToggleButton)view;
                 TvResponse.Tv tv=popularList.get(position);
-                SQLiteDatabase database=openHelper.getWritableDatabase();
                 String []selectionArgs={tv.id+"",Constants.TV_MEDIA_TYPE};
                 Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
                         Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
@@ -221,6 +225,8 @@ public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefresh
                     contentValues.put(Contract.FavTable.TITLE,tv.name);
                     database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
                 }
+
+
             }
         });
         topRatedAdapter=new TvActivityAdapter(getContext(), topRatedList, new TvActivityAdapter.OnItemClickListener() {
@@ -234,10 +240,10 @@ public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefresh
             }
 
             @Override
-            public void onToggleClicked(int position, View view) {
+            public void onToggleClicked(int position,View view) {
+                SQLiteDatabase database=openHelper.getWritableDatabase();
                 ToggleButton toggleButton =(ToggleButton)view;
                 TvResponse.Tv tv=topRatedList.get(position);
-                SQLiteDatabase database=openHelper.getWritableDatabase();
                 String []selectionArgs={tv.id+"",Constants.TV_MEDIA_TYPE};
                 Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
                         Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
@@ -257,6 +263,7 @@ public class TvFragment extends Fragment implements SwipeRefreshLayout.OnRefresh
                     contentValues.put(Contract.FavTable.TITLE,tv.name);
                     database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
                 }
+
             }
         });
         airingtodayRecycler.setAdapter(airingTodayAdapter);

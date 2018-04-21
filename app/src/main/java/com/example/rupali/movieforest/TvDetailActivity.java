@@ -1,7 +1,9 @@
 package com.example.rupali.movieforest;
 
+import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -14,13 +16,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -32,9 +39,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class TvDetailActivity extends AppCompatActivity {
-    ImageView trailerView;
+//    YouTubePlayerSupportFragment frag;
     ImageView poster;
-    ImageButton play;
     TextView title;
     TextView voteAverage;
     TextView overview;
@@ -59,6 +65,9 @@ public class TvDetailActivity extends AppCompatActivity {
     NestedScrollView nestedScrollView;
     TextView toolbarTitle;
     FavOpenHelper openHelper;
+    YouTubePlayerSupportFragment youTubePlayerFragment;
+    boolean isFullscreen=false;
+    YouTubePlayer youTubePlayer=null;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,18 +77,7 @@ public class TvDetailActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         toolbarTitle.setText("Tv Shows");
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        trailerView=findViewById(R.id.showTrailer);
         poster=findViewById(R.id.showPoster);
-        play=findViewById(R.id.show_play_button);
-        play.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(videoKey.length()!=0) {
-                    Intent intent=new Intent(Intent.ACTION_VIEW, Uri.parse(Constants.YOUTUBE_BASE_URL+videoKey));
-                    startActivity(intent);
-                }
-            }
-        });
         openHelper=FavOpenHelper.getInstance(this);
         title=findViewById(R.id.showTitle);
         voteAverage=findViewById(R.id.showVoteAverage);
@@ -146,14 +144,18 @@ public class TvDetailActivity extends AppCompatActivity {
         similarAdapter=new TvActivityAdapter(this, similarArrayList, new TvActivityAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-
+                Intent intent=new Intent(TvDetailActivity.this,TvDetailActivity.class);
+                Bundle bundle1=new Bundle();
+                bundle1.putInt(Constants.TV_ID,similarArrayList.get(position).id);
+                intent.putExtras(bundle1);
+                startActivity(intent);
             }
 
             @Override
-            public void onToggleClicked(int position, View view) {
+            public void onToggleClicked(int position,View view) {
+                SQLiteDatabase database=openHelper.getWritableDatabase();
                 ToggleButton toggleButton =(ToggleButton)view;
                 TvResponse.Tv tv=similarArrayList.get(position);
-                SQLiteDatabase database=openHelper.getWritableDatabase();
                 String []selectionArgs={tv.id+"",Constants.TV_MEDIA_TYPE};
                 Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
                         Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
@@ -173,12 +175,18 @@ public class TvDetailActivity extends AppCompatActivity {
                     contentValues.put(Contract.FavTable.TITLE,tv.name);
                     database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
                 }
+
             }
         });
         similarRecycler.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
         similarRecycler.setAdapter(similarAdapter);
         progressBar=findViewById(R.id.tvDetailProgressBsr);
         nestedScrollView=findViewById(R.id.contentTvDetail);
+//        frag=(YouTubePlayerSupportFragment) getSupportFragmentManager().findFragmentById(R.id.showTrailer);
+        youTubePlayerFragment = YouTubePlayerSupportFragment.newInstance();
+        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.showTrailer,youTubePlayerFragment).commit();
         Intent intent=getIntent();
         bundle=intent.getExtras();
         if(bundle!=null){
@@ -199,14 +207,65 @@ public class TvDetailActivity extends AppCompatActivity {
                 public void onResponse(Call<TvResponse.Tv> call, Response<TvResponse.Tv> response) {
                     TvResponse.Tv tv=response.body();
                     toolbarTitle.setText(tv.name);
-                    Picasso.get().load(Constants.IMAGE_BASE_URL+"w185/"+tv.poster_path).resize(325,500).into(poster);
+                    Picasso.get().load(Constants.IMAGE_BASE_URL+"w185/"+tv.poster_path).resize(340,500).into(poster);
                     if(tv.videos.results.size()!=0) {
                         videoKey = tv.videos.results.get(0).key;
-                        Picasso.get().load("http://img.youtube.com/vi/" + videoKey + "/mqdefault.jpg").resize(2000, 900).into(trailerView);
+                        youTubePlayerFragment.initialize(AppConfig.YOUTUBE_API_KEY, new YouTubePlayer.OnInitializedListener() {
+                            @Override
+                            public void onInitializationSuccess(YouTubePlayer.Provider provider, final YouTubePlayer player, boolean wasRestored) {
+                                if (!wasRestored) {
+                                    if(videoKey!=null) {
+                                        youTubePlayer=player;
+                                        player.cueVideo(videoKey);
+                                        player.setOnFullscreenListener(new YouTubePlayer.OnFullscreenListener() {
+                                            @Override
+                                            public void onFullscreen(boolean b) {
+                                                isFullscreen=b;
+                                            }
+                                        });
+                                        player.setPlaybackEventListener(new YouTubePlayer.PlaybackEventListener() {
+                                            @Override
+                                            public void onPlaying() {
+
+                                            }
+
+                                            @Override
+                                            public void onPaused() {
+
+                                            }
+
+                                            @Override
+                                            public void onStopped() {
+
+                                            }
+
+                                            @Override
+                                            public void onBuffering(boolean b) {
+                                                player.setFullscreen(true);
+                                            }
+
+                                            @Override
+                                            public void onSeekTo(int i) {
+
+                                            }
+                                        });
+
+
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult error) {
+                                String errorMessage = error.toString();
+                                Toast.makeText(TvDetailActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                                Log.d("errorMessage:", errorMessage);
+
+                            }
+                        });
+
                     }
                     else{
-                        trailerView.setBackgroundResource(R.drawable.no_video_availaible);
-                        play.setVisibility(View.GONE);
                     }
                     title.setText(tv.name);
                     voteAverage.setText(tv.vote_average+"");
@@ -220,7 +279,11 @@ public class TvDetailActivity extends AppCompatActivity {
                     ArrayList<Credits.Cast> casts=tv.credits.cast;
                     if(casts!=null){
                         castArrayList.clear();
-                        castArrayList.addAll(casts);
+                        for (int i=0;i<casts.size();i++){
+                            if(casts.get(i).profile_path!=null){
+                                castArrayList.add(casts.get(i));
+                            }
+                        }
                         castRecyclerAdapter.notifyDataSetChanged();
                     }
                     firstAirDate.setText("First Air Date: "+tv.first_air_date);
@@ -263,4 +326,16 @@ public class TvDetailActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onBackPressed() {
+        if(youTubePlayer!=null&&isFullscreen){
+            youTubePlayer.setFullscreen(false);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            isFullscreen=false;
+
+        }
+        else {
+            super.onBackPressed();
+        }
+    }
 }

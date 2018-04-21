@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--<resources>-->
+    <!--<color name="colorPrimary">#3F51B5</color>-->
+    <!--<color name="colorPrimaryDark">#303F9F</color>-->
+    <!--<color name="colorAccent">#FF4081</color>-->
+    <!--<color name="colorView">#009688</color>-->
+    <!--<color name="goldrod">#DAA520</color>-->
+    <!--<color name="brown">#795548</color>-->
+    <!--<color name="roseGray">#607D8B</color>-->
+<!--</resources>-->
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
-    <color name="colorView">#009688</color>
+    <color name="colorPrimary">#00695c</color>
+    <color name="colorPrimaryDark">#003d33</color>
+    <color name="colorHighlights">#439889</color>
+    <color name="colorAccent">#4db6ac</color>
+    <color name="colorView">#439889</color>
     <color name="goldrod">#DAA520</color>
     <color name="brown">#795548</color>
     <color name="roseGray">#607D8B</color>
+    <color name="lightgray">#FAFAFA</color>
+    <color name="gray">#F5F5F5</color>
+    <color name="darkGray">#EEEEEE</color>
+    <color name="login">#880E4F</color>
 </resources>

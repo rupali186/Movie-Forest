@@ -2,6 +2,7 @@ package com.example.rupali.movieforest;
 
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -15,12 +16,17 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import com.google.android.youtube.player.YouTubeInitializationResult;
+import com.google.android.youtube.player.YouTubePlayer;
+import com.google.android.youtube.player.YouTubePlayerSupportFragment;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -51,8 +57,11 @@ public class MovieItemActivity extends AppCompatActivity {
     TextView productionCountry;
     TextView title;
     TextView genres;
-    ImageView youTubeThumbnailView;
-    ImageButton playButton;
+    YouTubePlayerSupportFragment youTubePlayerFragment;
+    FrameLayout frameLayout;
+    //    ImageView youTubeThumbnailView;
+//    YouTubePlayerSupportFragment frag;
+//    ImageButton playButton;
     ImageView poster;
     String videoKey;
     ProgressBar progressBar;
@@ -64,6 +73,9 @@ public class MovieItemActivity extends AppCompatActivity {
     boolean isExpanded=false;
     TextView toolbarTitle;
     FavOpenHelper openHelper;
+    boolean genreClicked=false;
+    YouTubePlayer youTubePlayer=null;
+    boolean isFullscreen=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -109,29 +121,8 @@ public class MovieItemActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFavoriteClicked(int position,View view) {
-                ToggleButton toggleButton =(ToggleButton)view;
-                Movie movie1=similarArrayList.get(position);
-                SQLiteDatabase database=openHelper.getWritableDatabase();
-                String []selectionArgs={movie1.id+"",Constants.MOVIE_MEDIA_TYPE};
-                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
-                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
-                if(cursor.moveToFirst()){
-                    toggleButton.setChecked(false);
-                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
-                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
-                }
-                else {
-                    toggleButton.setChecked(true);
-                    ContentValues contentValues=new ContentValues();
-                    contentValues.put(Contract.FavTable.ID,movie1.id);
-                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
-                    contentValues.put(Contract.FavTable.MEDIA_TYPE,Constants.MOVIE_MEDIA_TYPE);
-                    contentValues.put(Contract.FavTable.POPULARITY,movie1.popularity);
-                    contentValues.put(Contract.FavTable.POSTER_PATH,movie1.poster_path);
-                    contentValues.put(Contract.FavTable.TITLE,movie1.title);
-                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
-                }
+            public void onFavoriteClicked(int position) {
+
             }
         }, similarArrayList);
         viewAllReview=findViewById(R.id.viewAllReviewRecycler);
@@ -155,9 +146,9 @@ public class MovieItemActivity extends AppCompatActivity {
         reviewRecyclerView.setAdapter(reviewRecyclerAdapter);
         contentMovieItem=findViewById(R.id.contentMovieItem);
         progressBar=findViewById(R.id.movieItemProgressBsr);
-        playButton=findViewById(R.id.playButton);
+//        playButton=findViewById(R.id.playButton);
         poster=findViewById(R.id.movie_item_poster);
-        youTubeThumbnailView=findViewById(R.id.movie_item_trailerVideo);
+//        youTubeThumbnailView=findViewById(R.id.movie_item_trailerVideo);
         overViewContent=findViewById(R.id.movie_item_overview_content);
         taglineContent=findViewById(R.id.movie_item_tagline_content);
         runtime=findViewById(R.id.runtime_content);
@@ -172,15 +163,15 @@ public class MovieItemActivity extends AppCompatActivity {
         crewRecyclerView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
         similarRecyclerView.setAdapter(similarRecyclerAdapter);
         similarRecyclerView.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
-        playButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(videoKey.length()!=0) {
-                    Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(Constants.YOUTUBE_BASE_URL+videoKey));
-                    startActivity(intent);
-                }
-            }
-        });
+//        playButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                if(videoKey.length()!=0) {
+//                    Intent intent=new Intent(Intent.ACTION_VIEW,Uri.parse(Constants.YOUTUBE_BASE_URL+videoKey));
+//                    startActivity(intent);
+//                }
+//            }
+//        });
         expandImageView=findViewById(R.id.expand);
         expandImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -197,6 +188,25 @@ public class MovieItemActivity extends AppCompatActivity {
                 }
             }
         });
+        genres.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!genreClicked){
+                    genres.setMaxLines(Integer.MAX_VALUE);
+                    genreClicked=true;
+                }
+                else {
+                    genres.setMaxLines(1);
+                    genreClicked=false;
+                }
+            }
+        });
+        frameLayout=findViewById(R.id.movie_item_trailerVideo);
+//        frag=(YouTubePlayerSupportFragment) getSupportFragmentManager().findFragmentById(R.id.movie_item_trailerVideo);
+        youTubePlayerFragment = YouTubePlayerSupportFragment.newInstance();
+        android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
+        android.support.v4.app.FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.movie_item_trailerVideo,youTubePlayerFragment).commit();
         Intent intent=getIntent();
         bundle=intent.getExtras();
         if(bundle!=null){
@@ -220,10 +230,65 @@ public class MovieItemActivity extends AppCompatActivity {
                 toolbarTitle.setText(movie.title);
                 if(movie.videos.results.size()!=0) {
                     videoKey = movie.videos.results.get(0).key;
-                    Picasso.get().load("http://img.youtube.com/vi/" + videoKey + "/mqdefault.jpg").resize(2000, 900).into(youTubeThumbnailView);
+                    youTubePlayerFragment.initialize(AppConfig.YOUTUBE_API_KEY, new YouTubePlayer.OnInitializedListener() {
+                        @Override
+                        public void onInitializationSuccess(YouTubePlayer.Provider provider, final YouTubePlayer player, boolean wasRestored) {
+                            if (!wasRestored) {
+                                if(videoKey!=null) {
+                                    youTubePlayer=player;
+                                    player.cueVideo(videoKey);
+                                    player.setOnFullscreenListener(new YouTubePlayer.OnFullscreenListener() {
+                                        @Override
+                                        public void onFullscreen(boolean b) {
+                                            isFullscreen=b;
+                                        }
+                                    });
+                                    player.setPlaybackEventListener(new YouTubePlayer.PlaybackEventListener() {
+                                        @Override
+                                        public void onPlaying() {
+
+                                        }
+
+                                        @Override
+                                        public void onPaused() {
+
+                                        }
+
+                                        @Override
+                                        public void onStopped() {
+
+                                        }
+
+                                        @Override
+                                        public void onBuffering(boolean b) {
+                                            player.setFullscreen(true);
+                                        }
+
+                                        @Override
+                                        public void onSeekTo(int i) {
+
+                                        }
+                                    });
+
+
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onInitializationFailure(YouTubePlayer.Provider provider, YouTubeInitializationResult error) {
+                            String errorMessage = error.toString();
+                            Toast.makeText(MovieItemActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+                            Log.d("errorMessage:", errorMessage);
+
+                        }
+                    });
+//                    Picasso.get().load("http://img.youtube.com/vi/" + videoKey + "/mqdefault.jpg").resize(2000, 900).into(youTubeThumbnailView);
                 }
                 else {
-                    playButton.setVisibility(View.GONE);
+//                    playButton.setVisibility(View.GONE);
+                    frameLayout.setBackgroundResource(R.drawable.no_video_availaible);
+
                 }
                 castArrayList.clear();
                 ArrayList<Credits.Cast> casts=movie.credits.cast;
@@ -289,7 +354,7 @@ public class MovieItemActivity extends AppCompatActivity {
                 reviewArrayList.clear();
                 reviewArrayList.addAll(reviews);
                 reviewRecyclerAdapter.notifyDataSetChanged();
-                Picasso.get().load(Constants.IMAGE_BASE_URL+"w342/"+movie.poster_path).into(poster);
+                Picasso.get().load(Constants.IMAGE_BASE_URL+"w185/"+movie.poster_path).resize(340,500).into(poster);
                 contentMovieItem.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
 
@@ -302,6 +367,18 @@ public class MovieItemActivity extends AppCompatActivity {
             }
         });
 
+    }
+    @Override
+    public void onBackPressed() {
+        if(youTubePlayer!=null&&isFullscreen){
+            youTubePlayer.setFullscreen(false);
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            isFullscreen=false;
+
+        }
+        else {
+            super.onBackPressed();
+        }
     }
 
 }

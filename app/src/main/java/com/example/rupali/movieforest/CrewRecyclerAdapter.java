@@ -44,7 +44,7 @@ public class CrewRecyclerAdapter extends RecyclerView.Adapter<CrewRecyclerAdapte
         Credits.Crew crew=crewArrayList.get(position);
         holder.creditTitle.setText(crew.name);
         holder.creditPost.setText(crew.job);
-        Picasso.get().load(Constants.IMAGE_BASE_URL+"w500/"+crew.profile_path).resize(400,600).into(holder.creditImage, new Callback() {
+        Picasso.get().load(Constants.IMAGE_BASE_URL+"w185/"+crew.profile_path).resize(400,600).into(holder.creditImage, new Callback() {
             @Override
             public void onSuccess() {
                 Log.d("PicassoCast: ","success");

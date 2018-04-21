@@ -46,7 +46,9 @@ public class CelebAdapterVertical extends RecyclerView.Adapter<CelebAdapterVerti
         Double popu = celeb.popularity;
         String angleFormatted = df.format(popu);
         holder.popularity.setText(angleFormatted);
-        Picasso.get().load(Constants.IMAGE_BASE_URL+"/w185"+celeb.profile_path).resize(300,400).into(holder.profile);
+        if(celeb.profile_path!=null) {
+            Picasso.get().load(Constants.IMAGE_BASE_URL + "/w185" + celeb.profile_path).resize(300, 400).into(holder.profile);
+        }
         holder.itemview.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -2,6 +2,7 @@
 <android.support.v4.widget.SwipeRefreshLayout android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/tv_swipe_refresh"
+    android:background="@color/darkGray"
     xmlns:android="http://schemas.android.com/apk/res/android" >
     <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -38,8 +39,9 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/airing_today_recycler"
                 android:layout_width="0dp"
+                android:background="@color/gray"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="0dp"
                 android:layout_marginTop="8dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.0"
@@ -53,7 +55,7 @@
                 android:layout_marginEnd="8dp"
                 android:text="View All"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
-                android:textColor="@color/colorView"
+                android:textColor="@color/colorHighlights"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_airing_today"
                 app:layout_constraintEnd_toEndOf="parent" />
 
@@ -63,7 +65,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:text="View All"
-                android:textColor="@color/colorView"
+                android:textColor="@color/colorHighlights"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_on_the_air_text"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -85,8 +87,9 @@
                 android:id="@+id/tv_on_the_air_recycler"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="0dp"
                 android:layout_marginTop="8dp"
+                android:background="@color/gray"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_on_the_air_text" />
@@ -110,7 +113,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:text="View All"
-                android:textColor="@color/colorView"
+                android:textColor="@color/colorHighlights"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_popular"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -119,9 +122,10 @@
                 android:id="@+id/tv_popular_recycler"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="0dp"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="8dp"
+                android:background="@color/gray"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/tv_popular" />
@@ -145,7 +149,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:text="View All"
-                android:textColor="@color/colorView"
+                android:textColor="@color/colorHighlights"
                 android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                 app:layout_constraintBottom_toBottomOf="@+id/tv_top_rated"
                 app:layout_constraintEnd_toEndOf="parent" />
@@ -155,9 +159,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:layout_marginEnd="8dp"
+                android:layout_marginEnd="0dp"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="8dp"
+                android:background="@color/gray"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1.0"

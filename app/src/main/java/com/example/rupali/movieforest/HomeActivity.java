@@ -1,23 +1,13 @@
 package com.example.rupali.movieforest;
 
-import android.app.Fragment;
-import android.app.FragmentManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -28,27 +18,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.URL;
-
-import javax.net.ssl.HttpsURLConnection;
+import com.facebook.login.LoginManager;
+import com.squareup.picasso.Picasso;
 
 import de.hdodenhof.circleimageview.CircleImageView;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-import retrofit2.Retrofit;
-import retrofit2.converter.gson.GsonConverterFactory;
 
 public class HomeActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -56,7 +32,8 @@ public class HomeActivity extends AppCompatActivity
     TextView logInOrSignUp;
     ImageView key;
     TextView toolbarTitle;
-    ImageView loginImageView;
+    CircleImageView loginImageView;
+    boolean loginWithFb=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +55,18 @@ public class HomeActivity extends AppCompatActivity
 
         nameTextView=(TextView) navigationView.getHeaderView(0).findViewById(R.id.login_profile_name);
         logInOrSignUp=(TextView) navigationView.getHeaderView(0).findViewById(R.id.logInOrSignUp);
+        logInOrSignUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(loginWithFb) {
+                    logout();
+                }
+                else {
+                    Intent intent=new Intent(HomeActivity.this,LoginActivity.class);
+                    startActivity(intent);
+                }
+            }
+        });
         key=navigationView.getHeaderView(0).findViewById(R.id.key);
         loginImageView=navigationView.getHeaderView(0).findViewById(R.id.loginImageView);
         SharedPreferences sharedPreferences=getSharedPreferences(Constants.SHARED_PREF_NAME,MODE_PRIVATE);
@@ -91,18 +80,16 @@ public class HomeActivity extends AppCompatActivity
         else {
             String name = sharedPreferences.getString(Constants.LOGIN_NAME, "name");
             String imageurl=sharedPreferences.getString(Constants.LOGIN_PROFILE_URL,"");
-            boolean loginWithFb=sharedPreferences.getBoolean(Constants.CONNECT_WITH_FACEBOOK,false);
+            Log.d("HOMETAGGER",imageurl);
+            loginWithFb=sharedPreferences.getBoolean(Constants.CONNECT_WITH_FACEBOOK,false);
             nameTextView.setText("Hi "+name+" !");
             if(loginWithFb&&imageurl!=null){
-//                ConstraintLayout.LayoutParams layoutParams=new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-//                layoutParams.setMargins(120,120,0,0);
-//                loginImageView.setLayoutParams(layoutParams);
-                new DownloadImageTask(loginImageView)
-                        .execute(imageurl);
+                logInOrSignUp.setText("Log Out");
+                Picasso.get().load(imageurl).into(loginImageView);
             }
             if(!loginWithFb){
+                logInOrSignUp.setText("Log In Or Sign Up!");
                 logInOrSignUp.setVisibility(View.VISIBLE);
-                key.setVisibility(View.VISIBLE);
             }
             Snackbar.make(navigationView,"Welcome "+name,Snackbar.LENGTH_LONG).show();
         }
@@ -110,9 +97,39 @@ public class HomeActivity extends AppCompatActivity
         android.support.v4.app.FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
         transaction.replace(R.id.container_x,fragment).commit();
+    }
 
-//        getSharedPreferences(Constants.SHARED_PREF_NAME, MODE_PRIVATE).edit()
-//                .putBoolean(Constants.PREVIOUSLY_STARTED, true).commit();
+    private void logout() {
+        AlertDialog.Builder builder=new AlertDialog.Builder(HomeActivity.this);
+        builder.setMessage("Do you want to LogOut?");
+        builder.setTitle("Confirm LogOut !");
+        builder.setNegativeButton("NO", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.dismiss();
+            }
+        });
+        builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                loginImageView.setImageDrawable(null);
+                loginImageView.setBackgroundResource(R.drawable.profile_i);
+                nameTextView.setText("Hi Guest !");
+                logInOrSignUp.setText("Log In Or Sign Up!");
+                SharedPreferences sharedPreferences=getSharedPreferences(Constants.SHARED_PREF_NAME,MODE_PRIVATE);
+                SharedPreferences.Editor editor=sharedPreferences.edit();
+                editor.putString(Constants.LOGIN_NAME,"Guest");
+                editor.putBoolean(Constants.CONNECT_WITH_FACEBOOK,false);
+                editor.putString(Constants.LOGIN_PROFILE_URL,"");
+                editor.putBoolean(Constants.PREVIOUSLY_STARTED,true);
+                editor.commit();
+                LoginManager.getInstance().logOut();
+                loginWithFb=false;
+                dialogInterface.dismiss();
+
+            }
+        });
+        builder.show();
     }
 
     @Override
@@ -246,50 +263,4 @@ public class HomeActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-}
- class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-    ImageView bmImage;
-
-    public DownloadImageTask(ImageView bmImage) {
-        this.bmImage = bmImage;
-    }
-
-    protected Bitmap doInBackground(String... urls) {
-        String urldisplay = urls[0];
-        Bitmap icon = null;
-        try {
-            InputStream in = new java.net.URL(urldisplay).openStream();
-            icon = BitmapFactory.decodeStream(in);
-        } catch (Exception e) {
-            Log.e("Error", e.getMessage());
-            e.printStackTrace();
-        }
-        icon=getCroppedBitmap(icon);
-        return icon;
-    }
-
-    protected void onPostExecute(Bitmap result) {
-        bmImage.setImageBitmap(result);
-    }
-     public Bitmap getCroppedBitmap(Bitmap bitmap) {
-         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
-                 bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-         Canvas canvas = new Canvas(output);
-
-         final int color = 0xff424242;
-         final Paint paint = new Paint();
-         final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
-
-         paint.setAntiAlias(true);
-         canvas.drawARGB(0, 0, 0, 0);
-         paint.setColor(color);
-         // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
-         canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
-                 bitmap.getWidth() / 2, paint);
-         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-         canvas.drawBitmap(bitmap, rect, rect, paint);
-         //Bitmap _bmp = Bitmap.createScaledBitmap(output, 60, 60, false);
-         //return _bmp;
-         return output;
-     }
 }

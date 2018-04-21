@@ -16,7 +16,7 @@
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".MovieActivity"
+            android:name=".LoginActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" >
 
@@ -33,14 +33,13 @@
             android:name=".MovieItemActivity"
             android:label="@string/title_activity_movie_item"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".YoutubePlayerActivity" />
         <activity
             android:name=".ReviewActivity"
             android:label="@string/title_activity_review"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".HomeActivity"
-            android:label="@string/title_activity_home"
+            android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

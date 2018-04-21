@@ -1,6 +1,7 @@
 package com.example.rupali.movieforest;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -39,7 +40,28 @@ public class FavouritesFragment extends Fragment {
         adapter=new SearchAdapter(getContext(), results, new SearchAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int position) {
-
+                SearchResults result=results.get(position);
+                if(result.media_type.equalsIgnoreCase("tv")){
+                    Intent intent=new Intent(getContext(),TvDetailActivity.class);
+                    Bundle bundle1=new Bundle();
+                    bundle1.putInt(Constants.TV_ID,result.id);
+                    intent.putExtras(bundle1);
+                    startActivity(intent);
+                }
+                else if(result.media_type.equalsIgnoreCase("movie")){
+                    Intent intent=new Intent(getContext(),MovieItemActivity.class);
+                    Bundle bundle1=new Bundle();
+                    bundle1.putInt(Constants.MOVIE_ID,result.id);
+                    intent.putExtras(bundle1);
+                    startActivity(intent);
+                }
+                else if(result.media_type.equalsIgnoreCase("person")){
+                    Intent intent=new Intent(getContext(),CelebsDetailActivity.class);
+                    Bundle bundle1=new Bundle();
+                    bundle1.putInt(Constants.CELEB_ID,result.id);
+                    intent.putExtras(bundle1);
+                    startActivity(intent);
+                }
             }
 
             @Override

@@ -45,7 +45,7 @@ public class CastRecyclerAdapter extends RecyclerView.Adapter<CastRecyclerAdapte
         Log.d("PicassoCast: ","success");
         holder.creditTitle.setText(cast.name);
         holder.creditPost.setText(cast.character);
-        Picasso.get().load("http://image.tmdb.org/t/p/w500/"+cast.profile_path).resize(400,600).into(holder.creditImage, new Callback() {
+        Picasso.get().load("http://image.tmdb.org/t/p/w185/"+cast.profile_path).resize(400,600).into(holder.creditImage, new Callback() {
             @Override
             public void onSuccess() {
                 Log.d("PicassoCast: ","success");

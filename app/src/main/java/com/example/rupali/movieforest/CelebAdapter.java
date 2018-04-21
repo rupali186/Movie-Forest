@@ -43,7 +43,9 @@ public class CelebAdapter extends RecyclerView.Adapter<CelebAdapter.ViewHolder> 
         if(celeb.name!=null) {
             holder.celebName.setText(celeb.name);
         }
-        Picasso.get().load(Constants.IMAGE_BASE_URL+"/w185"+celeb.profile_path).resize(300,400).into(holder.celebImage);
+        if (celeb.profile_path!=null) {
+            Picasso.get().load(Constants.IMAGE_BASE_URL + "/w185" + celeb.profile_path).resize(300, 400).into(holder.celebImage);
+        }
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

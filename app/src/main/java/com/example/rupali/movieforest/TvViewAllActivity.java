@@ -59,29 +59,8 @@ public class TvViewAllActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onToggleClicked(int position, View view) {
-                ToggleButton toggleButton =(ToggleButton)view;
-                TvResponse.Tv tv=tvArrayList.get(position);
-                SQLiteDatabase database=openHelper.getWritableDatabase();
-                String []selectionArgs={tv.id+"",Constants.TV_MEDIA_TYPE};
-                Cursor cursor=database.query(Contract.FavTable.TABLE_NAME,null,Contract.FavTable.ID+" =? AND "+
-                        Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs,null,null,null);
-                if(cursor.moveToFirst()){
-                    toggleButton.setChecked(false);
-                    database.delete(Contract.FavTable.TABLE_NAME,Contract.FavTable.ID+" =? AND "+
-                            Contract.FavTable.MEDIA_TYPE+" =? ",selectionArgs);
-                }
-                else {
-                    toggleButton.setChecked(true);
-                    ContentValues contentValues=new ContentValues();
-                    contentValues.put(Contract.FavTable.ID,tv.id);
-                    contentValues.put(Contract.FavTable.IS_TOGGLED,"true");
-                    contentValues.put(Contract.FavTable.MEDIA_TYPE,Constants.TV_MEDIA_TYPE);
-                    contentValues.put(Contract.FavTable.POPULARITY,tv.popularity);
-                    contentValues.put(Contract.FavTable.POSTER_PATH,tv.poster_path);
-                    contentValues.put(Contract.FavTable.TITLE,tv.name);
-                    database.insert(Contract.FavTable.TABLE_NAME,null,contentValues);
-                }
+            public void onToggleClicked(int position) {
+
             }
         });
         recyclerView.setAdapter(adapter);

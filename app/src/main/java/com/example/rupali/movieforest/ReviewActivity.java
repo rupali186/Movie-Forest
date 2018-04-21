@@ -73,6 +73,7 @@ public class ReviewActivity extends AppCompatActivity {
                 @Override
                 public void onFailure(Call<Movie> call, Throwable t) {
                     Log.d("Response",t.getMessage());
+                    Snackbar.make(toolbarTitle,"Network Error",Snackbar.LENGTH_SHORT).show();
 
                 }
             });
